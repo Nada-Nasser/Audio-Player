@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity
     ListAdapter listAdapter;
 
     MediaPlayer mediaPlayer;
+    int seekValue = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -39,6 +40,25 @@ public class MainActivity extends AppCompatActivity
         listAdapter = new ListAdapter(songsList);
         listView.setAdapter(listAdapter);
         getSongs();
+
+        songSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b)
+            {
+                seekValue = i;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar)
+            {
+                mediaPlayer.seekTo(seekValue);
+            }
+        });
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -151,6 +171,8 @@ public class MainActivity extends AppCompatActivity
                         if (mediaPlayer != null) {
                             int progress = mediaPlayer.getCurrentPosition();
                             songSeekBar.setProgress(progress);
+
+                            int curr = mediaPlayer.getDuration();
                         }
                     }
                 });
