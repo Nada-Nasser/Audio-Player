@@ -6,24 +6,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#d4d3d3">
 
     <SeekBar
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:id="@+id/seekBar1"
+        android:background="#fff"
+        android:id="@+id/SONG_SEEK_BAR"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:progressDrawable="@drawable/red_scrubber_progress"
         android:thumb="@drawable/red_scrubber_control" />
 
     <LinearLayout
-        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:weightSum="4"
         android:gravity="center"
-        android:padding="5dp">
+        android:padding="5dp"
+        android:background="#fff">
 
         <Button
             android:layout_marginRight="20dp"
@@ -32,7 +32,8 @@
             android:layout_height="wrap_content"
             android:text="Continue"
             android:textColor="#fff"
-            android:background="@drawable/button_style"/>
+            android:background="@drawable/button_style"
+            android:onClick="onClickContinueButton"/>
 
 
         <Button
@@ -40,15 +41,18 @@
             android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Stop"
+            android:text="Pause"
             android:textColor="#fff"
-            android:background="@drawable/button_style"/>
+            android:background="@drawable/button_style"
+            android:onClick="onClickStopButton"/>
     </LinearLayout>
 
     <ListView
+        android:layout_margin="10dp"
+        android:id="@+id/SONG_LIST_VIEW"
         android:layout_marginTop="10dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:dividerHeight="10dp"/>
+        android:layout_height="match_parent"
+        android:dividerHeight="10dp" />
 
 </LinearLayout>
