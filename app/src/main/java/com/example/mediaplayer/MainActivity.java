@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity
     int seekValue = 0;
     TextView currentSongTextView;
 
+    int NextSongPos = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -72,35 +74,64 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+      //  mediaPlayer=new MediaPlayer();
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                if(mediaPlayer!=null)
-                {
-                    mediaPlayer.stop();
-                }
-
-                SongInfo songInfo=songsList.get(position);
-
-                mediaPlayer=new MediaPlayer();
-                try {
-                    mediaPlayer.setDataSource(songInfo.getPath());
-                    mediaPlayer.prepare();
-                    mediaPlayer.start();
-                    currentSongTextView.setText(songInfo.getSongName());
-                    songSeekBar.setMax(mediaPlayer.getDuration());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(getApplicationContext(),"Make sure there is internet connetion",Toast.LENGTH_LONG).show();
-                }
-
-
+                setCurrentSong(position);
             }
         });
 
+        /*
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                setCurrentSong(NextSongPos);
+            }
+        });*/
+
         myThread thread = new myThread();
         thread.start();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkPermission();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        checkPermission();
+    }
+
+    private void setCurrentSong(int position)
+    {
+        if(mediaPlayer!=null)
+        {
+            mediaPlayer.stop();
+        }
+
+        SongInfo songInfo=songsList.get(position);
+
+        NextSongPos = position+1;
+        if(NextSongPos>= songsList.size())
+            NextSongPos = 0;
+
+        mediaPlayer=new MediaPlayer();
+        try {
+            mediaPlayer.setDataSource(songInfo.getPath());
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+            currentSongTextView.setText(songInfo.getSongName());
+            songSeekBar.setMax(mediaPlayer.getDuration());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -142,19 +173,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
-        switch (requestCode){
-            case SONGS_REQUEST_CODE:
-                if(grantResults[0]==PackageManager.PERMISSION_GRANTED)
-                {
-                    getSongs();
-                }
-                else {
-                    Toast.makeText(getApplicationContext(),"You can not use these feature without location access",
-                            Toast.LENGTH_LONG).show();
-                }
-                return;
-            default:
-                super.onRequestPermissionsResult(requestCode,permissions,grantResults);
+        if (requestCode == SONGS_REQUEST_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getSongs();
+            } else {
+                Toast.makeText(getApplicationContext(), "You can not use these feature without location access",
+                        Toast.LENGTH_LONG).show();
+            }
+            return;
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
@@ -253,7 +281,19 @@ public class MainActivity extends AppCompatActivity
                             int progress = mediaPlayer.getCurrentPosition();
                             songSeekBar.setProgress(progress);
 
-                            int curr = mediaPlayer.getDuration();
+
+                            int max = mediaPlayer.getDuration();
+
+                            if(progress >= max)
+                            {
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+
+                                setCurrentSong(NextSongPos);
+                            }
                         }
                     }
                 });
